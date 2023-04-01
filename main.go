@@ -57,6 +57,11 @@ func main() {
 		log.Fatalf("failed to iterate database rows: %s", err)
 	}
 
+	// avoid delete all files if there is no blob in database
+	if len(digestMap) == 0 {
+		log.Fatalf("no blob in database")
+	}
+
 	// Walk base directory and delete files
 	var totalSize, deleteCnt int64
 	if err := filepath.Walk(*baseDir, func(path string, info os.FileInfo, err error) error {
