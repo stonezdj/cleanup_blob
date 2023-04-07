@@ -48,7 +48,6 @@ func main() {
 
 	// Query digest list
 	digestMap := make(map[string]bool)
-	tobeDeleted := make(map[string]bool)
 	rows, err := db.Query("SELECT substr(digest, 8) FROM blob")
 	if err != nil {
 		log.Fatalf("failed to query database: %s", err)
@@ -72,7 +71,7 @@ func main() {
 
 	// Walk base directory and delete files
 	var totalSize, deleteCnt int64
-	blobSha256Dir := filepath.Join(*baseDir, "blobs", "sha256")
+	blobSha256Dir := filepath.Join(*baseDir, "blobs", "sha256", string(os.PathSeparator))
 	if err := filepath.Walk(blobSha256Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -92,7 +91,6 @@ func main() {
 				deleteCnt++
 				size := info.Size()
 				totalSize += size
-				tobeDeleted[digest] = true
 				if *dryRun {
 					log.Printf("would delete %s (size: %d)", path, size)
 				} else {
