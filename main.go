@@ -20,7 +20,7 @@ func main() {
 		dbUser  = flag.String("db_user", "postgres", "Postgres database user")
 		dbPass  = flag.String("db_pass", "root123", "Postgres database password")
 		dbName  = flag.String("db_name", "registry", "Postgres database name")
-		baseDir = flag.String("base_dir", "basedir", "Base directory to scan, for example: /var/lib/registry/docker/registry/v2")
+		baseDir = flag.String("base_dir", "basedir", "Base directory to scan, for example: /var/lib/registry/docker/registry/v2/blobs/sha256")
 		dryRun  = flag.Bool("dry_run", false, "Whether to skip deleting files")
 	)
 	flag.Parse()
@@ -109,35 +109,6 @@ func main() {
 		return nil
 	}); err != nil {
 		log.Fatalf("failed to walk base directory: %s", err)
-	}
-
-	// Walk repositories directory and delete files
-	repositoriesDir := filepath.Join(*baseDir, "repositories")
-	if err := filepath.Walk(repositoriesDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && info.Name() == `link` {
-			// Get digest from file path
-			subPath := strings.TrimPrefix(path, repositoriesDir)
-			parts := strings.Split(subPath, string(os.PathSeparator))
-			if len(parts) != 4 {
-				log.Printf("invalid file path: %s", subPath)
-				return nil
-			}
-			digest := parts[2]
-			if tobeDeleted[digest] {
-				if *dryRun {
-					log.Printf("would delete link file %s", path)
-				} else {
-					log.Printf("would delete link file %s", path)
-					os.Remove(path)
-				}
-			}
-		}
-		return nil
-	}); err != nil {
-		log.Fatalf("failed to walk repositories directory: %s", err)
 	}
 
 	// Print summary
