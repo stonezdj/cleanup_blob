@@ -17,7 +17,8 @@ go run ./cmd/cleanup/main.go -base_dir=/var/lib/registry/docker/registry/v2/blob
 
 ```
 redis-cli>
->dbsize
+# make sure most of the keys are start with blobs::sha25
+>keys *
 >flushdb
 >dbsize
 ```
