@@ -39,6 +39,13 @@ func main() {
 	}
 	defer db.Close()
 
+	// Delete orphaned blobs
+	if !*dryRun {
+		if _, err := db.Exec("delete from artifact_blob ab where not exists (select 1 from blob b where b.digest = ab.digest_af)"); err != nil {
+			log.Fatalf("failed to delete artifact_blob: %s", err)
+		}
+	}
+
 	// Query digest list
 	digestMap := make(map[string]bool)
 	rows, err := db.Query("SELECT substr(digest, 8) FROM blob")
