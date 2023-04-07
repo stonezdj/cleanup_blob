@@ -71,8 +71,7 @@ func main() {
 
 	// Walk base directory and delete files
 	var totalSize, deleteCnt int64
-	blobSha256Dir := filepath.Join(*baseDir, "blobs", "sha256/")
-	fmt.Println(blobSha256Dir)
+	blobSha256Dir := filepath.Join(*baseDir, "blobs", "sha256") + "/"
 	if err := filepath.Walk(blobSha256Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -82,7 +81,7 @@ func main() {
 			subPath := strings.TrimPrefix(path, blobSha256Dir)
 			parts := strings.Split(subPath, string(os.PathSeparator))
 			if len(parts) != 3 {
-				log.Printf("invalid file path: %s", subPath)
+				log.Printf("invalid file path: %s, size:%v", subPath, len(parts))
 				return nil
 			}
 			digest := parts[1]
