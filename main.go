@@ -72,6 +72,7 @@ func main() {
 	// Walk base directory and delete files
 	var totalSize, deleteCnt int64
 	blobSha256Dir := filepath.Join(*baseDir, "blobs", "sha256", string(os.PathSeparator))
+	fmt.Println(blobSha256Dir)
 	if err := filepath.Walk(blobSha256Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
