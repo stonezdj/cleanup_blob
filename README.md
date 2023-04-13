@@ -3,8 +3,7 @@
 
 ## Prerequest
 
-1. Mount the volumn of base directory to the current VM
-
+1. Mount the current nfs storage to the current VM
 2. If the database is in the k8s cluster, forward the db container's 5432 to localhost
 ```
 kubectl get pods -n tanzu-system-registry
@@ -14,11 +13,13 @@ kubectl port-forward harbor-database-0  5432:5432 -n tanzu-system-registry
 ```
 
 3. Change the harbor into read only mode, backup the NFS folder and database.
-
+```
+create table artifact_blob_backup as select * from artifact_blob;
+```
 4. Run the goloang program to cleanup the blob in the registry
 ```
-
 go run ./cmd/cleanup/main.go -base_dir=/var/lib/registry/docker/registry/v2 -dry_run=true
+go run ./cmd/cleanup/main.go -base_dir=/var/lib/registry/docker/registry/v2 -dry_run=false
 
 ```
 
@@ -33,4 +34,4 @@ redis-cli>
 >flushdb
 >dbsize
 ```
-5. Try to push and pull images in the registry
+6. Try to push and pull images in the registry
