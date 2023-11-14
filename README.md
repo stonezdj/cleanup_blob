@@ -14,12 +14,14 @@ kubectl port-forward harbor-database-0  5432:5432 -n tanzu-system-registry
 
 3. Change the harbor into read only mode, backup the NFS folder and database.
 ```
+kubect exec -it <harbor_db_pod> -- bash
+psql -U postgres -d registry
 create table artifact_blob_backup as select * from artifact_blob;
 ```
-4. Run the goloang program to cleanup the blob in the registry
+4. Run the goloang program to cleanup the blob in the registry, where the /var/lib/registry/docker/registry/v2 is the registry storage folder, should end with /v2, and the db_pass is the database password, and the dry_run is the flag to indicate if the program will delete the blob or not.
 ```
-go run ./cmd/cleanup/main.go -base_dir=/var/lib/registry/docker/registry/v2 -dry_run=true
-go run ./cmd/cleanup/main.go -base_dir=/var/lib/registry/docker/registry/v2 -dry_run=false
+go run main.go -base_dir=/var/lib/registry/docker/registry/v2 -db_pass=<password> -dry_run=true
+go run main.go -base_dir=/var/lib/registry/docker/registry/v2 -db_pass=<password> -dry_run=false
 
 ```
 
